@@ -352,7 +352,7 @@ export default function ListingDetailPage({ params }: ListingDetailPageProps) {
                           </Badge>
                         )}
                       </div>
-                      <p className="text-xs md:text-sm text-gray-500">Anggota sejak {listing.user?.createdAt ? formatDate(listing.user.createdAt) : 'Baru'}</p>
+                      <p className="text-xs md:text-sm text-gray-500">Anggota sejak {listing.user?.createdAt ? new Date(listing.user.createdAt).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' }) : '-'}</p>
                     </div>
                   </div>
                   
