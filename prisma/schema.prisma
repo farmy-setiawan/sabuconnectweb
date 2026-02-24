@@ -256,3 +256,17 @@ model PromoBanner {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 }
+
+// Village (Desa) for Sabu Raijua Regency
+model Village {
+  id          String    @id @default(cuid())
+  name        String    // Village name (e.g., Desa Raha)
+  district    String    // District name (e.g., Kecamatan Rai Manuk)
+  description String?   // Description of the village
+  population  Int?      // Population count
+  area        String?   // Area in km²
+  isActive    Boolean   @default(true)
+  order       Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
