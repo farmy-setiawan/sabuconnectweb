@@ -1,0 +1,258 @@
+// This is your Prisma schema file
+// Learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  PROVIDER
+  ADMIN
+}
+
+enum CategoryType {
+  JASA
+  PRODUK
+}
+
+enum PriceType {
+  FIXED
+  NEGOTIABLE
+  STARTING_FROM
+}
+
+enum ListingStatus {
+  ACTIVE
+  INACTIVE
+  PENDING
+  REJECTED
+}
+
+enum TransactionStatus {
+  PENDING
+  ACCEPTED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  COD
+  TRANSFER
+}
+
+enum BankAccountType {
+  BANK
+  E_WALLET
+  PULSA
+}
+
+model BankAccount {
+  id          String   @id @default(cuid())
+  name        String   // Bank name or wallet name (e.g., BCA, GoPay, Dana)
+  accountNumber String  // Account number or phone number
+  accountName String   // Account holder name
+  type        BankAccountType @default(BANK)
+  isActive    Boolean  @default(true)
+  isDefault   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model SiteSettings {
+  id        String   @id @default("site_settings")
+  logo      String?  // Logo URL (base64 or path)
+  siteName  String   @default("SABUConnect")
+  updatedAt DateTime @updatedAt
+}
+
+model User {
+  id              String    @id @default(cuid())
+  email          String    @unique
+  password       String
+  name           String
+  phone          String
+  role           Role      @default(USER)
+  isVerified     Boolean   @default(false)
+  avatar         String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  listings       Listing[]
+  ads            Ad[]
+  customerTransactions Transaction[] @relation("CustomerTransactions")
+  providerTransactions Transaction[] @relation("ProviderTransactions")
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  type        CategoryType
+  image       String?
+  parentId    String?
+  parent      Category? @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children    Category[] @relation("CategoryHierarchy")
+  listings    Listing[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Listing {
+  id          String    @id @default(cuid())
+  title       String
+  slug        String    @unique
+  description String
+  price       Decimal
+  priceType   PriceType @default(FIXED)
+  images      String[]  
+  location    String
+  phone       String
+  status      ListingStatus @default(ACTIVE)
+  isFeatured  Boolean   @default(false)
+  views       Int       @default(0)
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categoryId  String
+  category    Category  @relation(fields: [categoryId], references: [id])
+  transactions Transaction[]
+  ads         Ad[]
+  promotion   PromotionPayment?
+  // Promotion fields
+  promotionStatus    PromotionStatus @default(NONE)
+  promotionStart    DateTime?
+  promotionEnd      DateTime?
+  promotionDays      Int?
+  promotionPrice     Decimal?
+  promotionPriority  Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Transaction {
+  id            String            @id @default(cuid())
+  listingId     String
+  listing       Listing           @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  customerId    String
+  customer      User              @relation("CustomerTransactions", fields: [customerId], references: [id])
+  providerId    String
+  provider      User              @relation("ProviderTransactions", fields: [providerId], references: [id])
+  status        TransactionStatus @default(PENDING)
+  paymentMethod PaymentMethod?
+  notes         String?
+  amount        Decimal
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+}
+
+model WhatsAppClick {
+  id        String   @id @default(cuid())
+  listingId String
+  phone     String
+  createdAt DateTime @default(now())
+}
+
+model Ad {
+  id              String          @id @default(cuid())
+  providerId      String
+  provider        User            @relation(fields: [providerId], references: [id])
+  listingId       String?
+  listing         Listing?        @relation(fields: [listingId], references: [id])
+  title           String
+  description     String?
+  location        String?
+  status          AdStatus        @default(PENDING_APPROVAL)
+  paymentMethod   PaymentMethod   @default(TRANSFER)
+  paymentStatus   PaymentStatus   @default(UNPAID)
+  price           Decimal
+  startDate       DateTime
+  endDate         DateTime
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  payment         Payment?
+}
+
+model Payment {
+  id            String          @id @default(cuid())
+  adId          String          @unique
+  ad            Ad              @relation(fields: [adId], references: [id], onDelete: Cascade)
+  method        PaymentMethod
+  proofImage   String?
+  verifiedBy    String?
+  verifiedAt    DateTime?
+  status        PaymentStatus   @default(VERIFICATION)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+}
+
+enum AdStatus {
+  DRAFT
+  PENDING_APPROVAL
+  WAITING_PAYMENT
+  ACTIVE
+  REJECTED
+  EXPIRED
+}
+
+enum PaymentStatus {
+  UNPAID
+  VERIFICATION
+  PAID
+  PAYMENT_REJECTED
+  PENDING_COD
+}
+
+// Listing Promotion
+enum PromotionStatus {
+  NONE
+  PENDING_APPROVAL
+  WAITING_PAYMENT
+  PAYMENT_UPLOADED
+  ACTIVE
+  REJECTED
+  EXPIRED
+  STOPPED
+}
+
+model PromotionPayment {
+  id              String          @id @default(cuid())
+  listingId       String          @unique
+  listing         Listing         @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  providerId      String
+  amount          Decimal
+  method          PaymentMethod
+  proofImage     String?
+  status          PromotionPaymentStatus @default(PENDING)
+  verifiedBy      String?
+  verifiedAt      DateTime?
+  rejectionReason String?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+}
+
+enum PromotionPaymentStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+// Promo Banner for homepage
+model PromoBanner {
+  id          String    @id @default(cuid())
+  title       String
+  subtitle    String?
+  image       String    // Base64 or URL
+  link        String?
+  position    String    @default("hero") // hero, below_hero, middle, footer
+  isActive    Boolean   @default(true)
+  order       Int       @default(0)
+  startDate   DateTime?
+  endDate     DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
