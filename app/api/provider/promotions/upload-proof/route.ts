@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import prisma from '@/lib/prisma/prisma'
-import { writeFile, mkdir } from 'fs/promises'
-import path from 'path'
 
 export const dynamic = 'force-dynamic'
 
@@ -54,24 +52,20 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Tidak ada pembayaran yang pending' }, { status: 400 })
     }
 
-    // Save the proof image
+    // Convert image to base64 (for Vercel compatibility)
     const bytes = await proof.arrayBuffer()
     const buffer = Buffer.from(bytes)
+    const base64 = buffer.toString('base64')
+    const mimeType = proof.type
     
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'promotions')
-    await mkdir(uploadDir, { recursive: true })
-    
-    const fileName = `promotion_${listingId}_${Date.now()}.${proof.name.split('.').pop()}`
-    const filePath = path.join(uploadDir, fileName)
-    await writeFile(filePath, buffer)
-
-    const proofUrl = `/uploads/promotions/${fileName}`
+    // Create data URL for storage
+    const proofDataUrl = `data:${mimeType};base64,${base64}`
 
     // Update promotion payment with proof
     await prisma.promotionPayment.update({
       where: { listingId: listing.id },
       data: {
-        proofImage: proofUrl,
+        proofImage: proofDataUrl,
         status: 'PENDING'
       }
     })
@@ -86,8 +80,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       success: true,
-      message: 'Bukti pembayaran telah diupload dan menunggu verifikasi admin',
-      proofUrl
+      message: 'Bukti pembayaran telah diupload dan menunggu verifikasi admin'
     })
 
   } catch (error) {
