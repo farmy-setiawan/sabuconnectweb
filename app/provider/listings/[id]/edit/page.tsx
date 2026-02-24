@@ -12,6 +12,12 @@ import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
 import { Textarea } from '@/components/ui/Textarea'
 
+interface Village {
+  id: string
+  name: string
+  district: string
+}
+
 const categories = [
   { label: 'Pilih Kategori', value: '' },
   { label: 'Konstruksi & Bangunan', value: 'konstruksi-bangunan' },
@@ -32,50 +38,6 @@ const categories = [
   { label: 'Tanaman & Bibit', value: 'tanaman-bibit' },
   { label: 'Ternak & Peternakan', value: 'ternak-peternakan' },
   { label: 'Produk Lainnya', value: 'produk-lainnya' },
-]
-
-const locations = [
-  { label: 'Pilih Lokasi', value: '' },
-  { label: 'Kota Waikabubak', value: 'Kota Waikabubak' },
-  { label: 'Kecamatan Kota Waikabubak', value: 'Kecamatan Kota Waikabubak' },
-  { label: 'Kecamatan Lawa', value: 'Kecamatan Lawa' },
-  { label: 'Kecamatan Malaka', value: 'Kecamatan Malaka' },
-  { label: 'Kecamatan Paga', value: 'Kecamatan Paga' },
-  { label: 'Kecamatan Rai Manuk', value: 'Kecamatan Rai Manuk' },
-  { label: 'Kecamatan Sawu', value: 'Kecamatan Sawu' },
-  { label: 'Kecamatan Loli', value: 'Kecamatan Loli' },
-  { label: 'Kecamatan Waiman', value: 'Kecamatan Waiman' },
-  { label: 'Desa Ada', value: 'Desa Ada' },
-  { label: 'Desa Baha', value: 'Desa Baha' },
-  { label: 'Desa Biloli', value: 'Desa Biloli' },
-  { label: 'Desa Bokong', value: 'Desa Bokong' },
-  { label: 'Desa Delo', value: 'Desa Delo' },
-  { label: 'Desa Ea', value: 'Desa Ea' },
-  { label: 'Desa Halik', value: 'Desa Halik' },
-  { label: 'Desa Kadubhai', value: 'Desa Kadubhai' },
-  { label: 'Desa Kawangu', value: 'Desa Kawangu' },
-  { label: 'Desa Konda Malaka', value: 'Desa Konda Malaka' },
-  { label: 'Desa Kuatnana', value: 'Desa Kuatnana' },
-  { label: 'Desa Lainde', value: 'Desa Lainde' },
-  { label: 'Desa Leloboko', value: 'Desa Leloboko' },
-  { label: 'Desa Lelowa', value: 'Desa Lelowa' },
-  { label: 'Desa Lobholi', value: 'Desa Lobholi' },
-  { label: 'Desa Lohayong', value: 'Desa Lohayong' },
-  { label: 'Desa Madan', value: 'Desa Madan' },
-  { label: 'Desa Mnelalete', value: 'Desa Mnelalete' },
-  { label: 'Desa Nggalak', value: 'Desa Nggalak' },
-  { label: 'Desa Olais', value: 'Desa Olais' },
-  { label: 'Desa Patiala', value: 'Desa Patiala' },
-  { label: 'Desa Raknamo', value: 'Desa Raknamo' },
-  { label: 'Desa Rebo', value: 'Desa Rebo' },
-  { label: 'Desa Reroroja', value: 'Desa Reroroja' },
-  { label: 'Desa Sbarang', value: 'Desa Sbarang' },
-  { label: 'Desa Semana', value: 'Desa Semana' },
-  { label: 'Desa Sikka', value: 'Desa Sikka' },
-  { label: 'Desa Tafuli', value: 'Desa Tafuli' },
-  { label: 'Desa Tena Teke', value: 'Desa Tena Teke' },
-  { label: 'Desa Tikatuk', value: 'Desa Tikatuk' },
-  { label: 'Desa Umalulu', value: 'Desa Umalulu' },
 ]
 
 // Sample data for demo
@@ -99,6 +61,32 @@ export default function EditListingPage() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [villages, setVillages] = useState<Village[]>([])
+  
+  // Fetch villages from database
+  useEffect(() => {
+    async function fetchVillages() {
+      try {
+        const res = await fetch('/api/villages')
+        const data = await res.json()
+        if (data.villages) {
+          setVillages(data.villages)
+        }
+      } catch (error) {
+        console.error('Error fetching villages:', error)
+      }
+    }
+    fetchVillages()
+  }, [])
+
+  // Build location options from villages
+  const locations = [
+    { label: 'Pilih Lokasi', value: '' },
+    ...villages.map(v => ({
+      label: `${v.name} (${v.district})`,
+      value: `${v.name}, ${v.district}`
+    }))
+  ]
   
   const [formData, setFormData] = useState({
     title: '',
