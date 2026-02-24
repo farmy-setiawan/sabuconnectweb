@@ -5,8 +5,14 @@ import { useState, useEffect } from 'react'
 import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
 import { Button } from '@/components/ui/Button'
-import { LOCATIONS, PRICE_TYPES } from '@/lib/constants'
+import { PRICE_TYPES } from '@/lib/constants'
 import type { Category } from '@/types'
+
+interface Village {
+  id: string
+  name: string
+  district: string
+}
 
 interface SearchFiltersProps {
   categories: Category[]
@@ -20,9 +26,27 @@ export function SearchFilters({ categories }: SearchFiltersProps) {
   const [type, setType] = useState(searchParams.get('type') || '')
   const [categoryId, setCategoryId] = useState(searchParams.get('categoryId') || '')
   const [location, setLocation] = useState(searchParams.get('location') || '')
+  const [village, setVillage] = useState(searchParams.get('village') || '')
   const [minPrice, setMinPrice] = useState(searchParams.get('minPrice') || '')
   const [maxPrice, setMaxPrice] = useState(searchParams.get('maxPrice') || '')
   const [sortBy, setSortBy] = useState(searchParams.get('sortBy') || 'newest')
+  const [villages, setVillages] = useState<Village[]>([])
+
+  // Fetch villages from database
+  useEffect(() => {
+    async function fetchVillages() {
+      try {
+        const res = await fetch('/api/villages')
+        const data = await res.json()
+        if (data.villages) {
+          setVillages(data.villages)
+        }
+      } catch (error) {
+        console.error('Error fetching villages:', error)
+      }
+    }
+    fetchVillages()
+  }, [])
 
   const handleSearch = () => {
     const params = new URLSearchParams()
@@ -30,6 +54,7 @@ export function SearchFilters({ categories }: SearchFiltersProps) {
     if (type) params.set('type', type)
     if (categoryId) params.set('categoryId', categoryId)
     if (location) params.set('location', location)
+    if (village) params.set('village', village)
     if (minPrice) params.set('minPrice', minPrice)
     if (maxPrice) params.set('maxPrice', maxPrice)
     if (sortBy) params.set('sortBy', sortBy)
@@ -42,6 +67,7 @@ export function SearchFilters({ categories }: SearchFiltersProps) {
     setType('')
     setCategoryId('')
     setLocation('')
+    setVillage('')
     setMinPrice('')
     setMaxPrice('')
     setSortBy('newest')
@@ -61,7 +87,10 @@ export function SearchFilters({ categories }: SearchFiltersProps) {
 
   const locationOptions = [
     { label: 'Semua Lokasi', value: '' },
-    ...LOCATIONS.map((loc) => ({ label: loc, value: loc })),
+    ...villages.map(v => ({
+      label: `${v.name} (${v.district})`,
+      value: `${v.name}, ${v.district}`
+    }))
   ]
 
   const sortOptions = [

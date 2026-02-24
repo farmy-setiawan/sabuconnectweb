@@ -12,6 +12,7 @@ interface SearchParams {
   categoryId?: string
   type?: string
   location?: string
+  village?: string
   minPrice?: string
   maxPrice?: string
   sortBy?: string
@@ -19,7 +20,7 @@ interface SearchParams {
 }
 
 async function getListings(params: SearchParams) {
-  const { q, categoryId, type, location, minPrice, maxPrice, sortBy, page } = params
+  const { q, categoryId, type, location, village, minPrice, maxPrice, sortBy, page } = params
 
   const where: Record<string, unknown> = {
     status: 'ACTIVE',
@@ -40,8 +41,9 @@ async function getListings(params: SearchParams) {
     where.category = { type }
   }
 
-  if (location) {
-    where.location = { contains: location, mode: 'insensitive' }
+  if (location || village) {
+    const searchLocation = village || location
+    where.location = { contains: searchLocation, mode: 'insensitive' }
   }
 
   if (minPrice || maxPrice) {
