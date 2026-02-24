@@ -11,12 +11,7 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
 import { Textarea } from '@/components/ui/Textarea'
-
-interface Village {
-  id: string
-  name: string
-  district: string
-}
+import { LocationAutocomplete } from '@/components/ui/LocationAutocomplete'
 
 const categories = [
   { label: 'Pilih Kategori', value: '' },
@@ -45,32 +40,6 @@ export default function NewListingPage() {
   const { data: session, status } = useSession()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [villages, setVillages] = useState<Village[]>([])
-  
-  // Fetch villages from database
-  useEffect(() => {
-    async function fetchVillages() {
-      try {
-        const res = await fetch('/api/villages')
-        const data = await res.json()
-        if (data.villages) {
-          setVillages(data.villages)
-        }
-      } catch (error) {
-        console.error('Error fetching villages:', error)
-      }
-    }
-    fetchVillages()
-  }, [])
-
-  // Build location options from villages
-  const locations = [
-    { label: 'Pilih Lokasi', value: '' },
-    ...villages.map(v => ({
-      label: `${v.name} (${v.district})`,
-      value: `${v.name}, ${v.district}`
-    }))
-  ]
   
   const [formData, setFormData] = useState({
     title: '',
@@ -230,14 +199,17 @@ export default function NewListingPage() {
                       required
                     />
 
-                    <Select
-                      label="Lokasi"
-                      name="location"
-                      value={formData.location}
-                      onChange={handleChange}
-                      options={locations}
-                      required
-                    />
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Lokasi <span className="text-red-500">*</span>
+                      </label>
+                      <LocationAutocomplete
+                        value={formData.location}
+                        onChange={(value) => setFormData(prev => ({ ...prev, location: value }))}
+                        placeholder="Ketik nama desa..."
+                        required
+                      />
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

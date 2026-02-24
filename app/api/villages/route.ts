@@ -4,11 +4,12 @@ import prisma from '@/lib/prisma/prisma'
 export const dynamic = 'force-dynamic'
 export const revalidate = 3600 // Cache for 1 hour (villages don't change often)
 
-// GET all active villages (public endpoint for dropdowns)
+// GET villages with optional search and district filter
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
     const district = searchParams.get('district')
+    const search = searchParams.get('search')
 
     const where: Record<string, unknown> = {
       isActive: true,
@@ -16,6 +17,13 @@ export async function GET(request: Request) {
 
     if (district) {
       where.district = district
+    }
+
+    if (search) {
+      where.name = {
+        contains: search,
+        mode: 'insensitive',
+      }
     }
 
     const villages = await prisma.village.findMany({
@@ -30,6 +38,7 @@ export async function GET(request: Request) {
         { order: 'asc' },
         { name: 'asc' },
       ],
+      take: search ? 20 : 100, // Limit results for search
     })
 
     // Group villages by district for better UX
