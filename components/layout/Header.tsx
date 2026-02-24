@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { memo, useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { useSession, signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
@@ -12,7 +12,7 @@ interface SiteSettings {
   siteName: string
 }
 
-export function Header() {
+function HeaderComponent() {
   const { data: session, status } = useSession()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -23,10 +23,9 @@ export function Header() {
   useEffect(() => {
     setMounted(true)
     fetchSiteSettings()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const fetchSiteSettings = useCallback(async () => {
+  const fetchSiteSettings = async () => {
     try {
       const res = await fetch('/api/site-settings')
       if (res.ok) {
@@ -36,7 +35,7 @@ export function Header() {
     } catch (error) {
       console.error('Error fetching site settings:', error)
     }
-  }, [])
+  }
 
   const handleSearch = useCallback((e: React.FormEvent) => {
     e.preventDefault()
@@ -204,3 +203,7 @@ export function Header() {
     </header>
   )
 }
+
+// Memoized export for performance optimization
+export const Header = memo(HeaderComponent)
+Header.displayName = 'Header'
