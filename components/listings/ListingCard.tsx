@@ -71,11 +71,11 @@ export function ListingCard({ listing }: ListingCardProps) {
           {/* Top Left - Trusted Badge */}
           {listing.promotionStatus === 'ACTIVE' && (
             <div className="absolute top-2 left-2 md:top-3 md:left-3">
-              <Badge className="bg-gradient-to-r from-green-600 to-green-500 text-white shadow-lg shadow-green-600/40 border-0 font-semibold px-1.5 py-0.5 md:px-3 md:py-1.5 flex items-center">
+              <Badge className="bg-gradient-to-r from-green-600 to-green-500 text-white shadow-lg shadow-green-600/40 border-0 font-semibold px-1.5 py-0.5 md:px-3 md:py-1.5 flex items-center text-[10px] md:text-xs">
                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
-                <span className="hidden md:inline text-[10px] md:text-xs">Terpercaya</span>
+                <span className="ml-1">Terpercaya</span>
               </Badge>
             </div>
           )}
@@ -83,11 +83,12 @@ export function ListingCard({ listing }: ListingCardProps) {
           {/* Top Right - Verified Badge */}
           {listing.user?.isVerified && (
             <div className="absolute top-2 right-2 md:top-3 md:right-3">
-              <Badge className="bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/30 border-0 flex items-center gap-1 px-1.5 py-0.5 md:px-3 md:py-1.5">
+              <Badge className="bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/30 border-0 flex items-center gap-1 px-1.5 py-0.5 md:px-3 md:py-1.5 text-[10px] md:text-xs">
                 <svg className="w-3 h-3 md:w-3.5 md:h-3.5" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
-                <span className="text-[10px] md:text-xs hidden md:inline">Terverifikasi</span>
+                <span className="hidden md:inline">Terverifikasi</span>
+                <span className="md:hidden ml-1">Verified</span>
               </Badge>
             </div>
           )}
