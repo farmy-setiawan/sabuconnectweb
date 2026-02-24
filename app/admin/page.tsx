@@ -17,14 +17,12 @@ export default async function AdminDashboardPage() {
   const [
     usersCount, 
     listingsCount, 
-    transactionsCount, 
     categoriesCount,
     providersCount,
     productsCount
   ] = await Promise.all([
     prisma.user.count(),
     prisma.listing.count(),
-    prisma.transaction.count(),
     prisma.category.count(),
     prisma.user.count({ where: { role: 'PROVIDER' } }),
     prisma.listing.count({ where: { category: { type: 'PRODUK' } } }),
@@ -55,16 +53,6 @@ export default async function AdminDashboardPage() {
     include: {
       user: { select: { name: true } },
       category: { select: { name: true } },
-    },
-  })
-
-  const recentTransactions = await prisma.transaction.findMany({
-    orderBy: { createdAt: 'desc' },
-    take: 5,
-    include: {
-      listing: { select: { title: true } },
-      customer: { select: { name: true } },
-      provider: { select: { name: true } },
     },
   })
 
@@ -113,17 +101,6 @@ export default async function AdminDashboardPage() {
       ),
       color: 'bg-indigo-500',
       description: 'Kelola iklan provider'
-    },
-    { 
-      href: '/admin/transactions', 
-      label: 'Transaksi', 
-      icon: (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-        </svg>
-      ),
-      color: 'bg-green-500',
-      description: 'Lihat semua transaksi'
     },
     { 
       href: '/admin/bank-accounts', 
@@ -247,24 +224,6 @@ export default async function AdminDashboardPage() {
                 </div>
               </CardContent>
             </Card>
-
-            {/* Total Transactions */}
-            <Card className="border-0 shadow-sm hover:shadow-md transition-shadow">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Total Transaksi</p>
-                    <p className="text-3xl font-bold text-gray-900 mt-1">{transactionsCount}</p>
-                    <p className="text-xs text-gray-400 mt-1">{categoriesCount} kategori</p>
-                  </div>
-                  <div className="w-14 h-14 bg-purple-50 rounded-xl flex items-center justify-center">
-                    <svg className="w-7 h-7 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                    </svg>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
           </div>
 
           {/* Menu Grid */}
@@ -323,49 +282,6 @@ export default async function AdminDashboardPage() {
                       }`}>
                         {listing.status}
                       </span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Recent Transactions */}
-            <Card className="border-0 shadow-sm">
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg font-semibold">Transaksi Terbaru</CardTitle>
-                  <Link href="/admin/transactions" className="text-sm text-[#03a21d] hover:underline">
-                    Lihat Semua
-                  </Link>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {recentTransactions.map((transaction) => (
-                    <div key={transaction.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                          <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                        </div>
-                        <div>
-                          <p className="font-medium text-gray-900 line-clamp-1">{transaction.listing.title}</p>
-                          <p className="text-xs text-gray-500">{transaction.customer.name} → {transaction.provider.name}</p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-semibold text-[#03a21d]">Rp {Number(transaction.amount).toLocaleString('id-ID')}</p>
-                        <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
-                          transaction.status === 'COMPLETED' 
-                            ? 'bg-green-100 text-green-700' 
-                            : transaction.status === 'PENDING'
-                            ? 'bg-yellow-100 text-yellow-700'
-                            : 'bg-gray-100 text-gray-700'
-                        }`}>
-                          {transaction.status}
-                        </span>
-                      </div>
                     </div>
                   ))}
                 </div>
