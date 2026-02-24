@@ -23,6 +23,38 @@ async function main() {
   })
   console.log('Created admin:', admin.email)
 
+  // Create default provider
+  const providerPassword = await bcrypt.hash('provider123', 12)
+  const provider = await prisma.user.upsert({
+    where: { email: 'provider@sabuconnect.id' },
+    update: {},
+    create: {
+      email: 'provider@sabuconnect.id',
+      name: 'Toko Sabu',
+      phone: '6289876543210',
+      password: providerPassword,
+      role: 'PROVIDER',
+      isVerified: true,
+    },
+  })
+  console.log('Created provider:', provider.email)
+
+  // Create demo user (masyarakat)
+  const userPassword = await bcrypt.hash('user123', 12)
+  const user = await prisma.user.upsert({
+    where: { email: 'user@sabuconnect.id' },
+    update: {},
+    create: {
+      email: 'user@sabuconnect.id',
+      name: 'Ahmad Wijaya',
+      phone: '6285123456789',
+      password: userPassword,
+      role: 'USER',
+      isVerified: false,
+    },
+  })
+  console.log('Created user:', user.email)
+
   // Create default categories
   const jasaCategories: { name: string; slug: string; type: 'JASA' | 'PRODUK' }[] = [
     { name: 'Konstruksi & Bangunan', slug: 'konstruksi-bangunan', type: 'JASA' },
@@ -66,29 +98,17 @@ async function main() {
 
   console.log('Created categories')
 
-  // Create a demo provider
-  const providerPassword = await bcrypt.hash('provider123', 12)
-  const provider = await prisma.user.upsert({
-    where: { email: 'provider@sabuconnect.id' },
-    update: {},
-    create: {
-      email: 'provider@sabuconnect.id',
-      name: 'Toko Sabu',
-      phone: '6289876543210',
-      password: providerPassword,
-      role: 'PROVIDER',
-      isVerified: true,
-    },
-  })
-  console.log('Created provider:', provider.email)
-
   // Get a category for the sample listing
   const category = await prisma.category.findFirst({
     where: { type: 'PRODUK' },
   })
 
+  const jasaCategory = await prisma.category.findFirst({
+    where: { type: 'JASA' },
+  })
+
   if (category && provider) {
-    // Create sample listing
+    // Create sample product listing
     await prisma.listing.upsert({
       where: { slug: 'kelapa-bali-sabu-raijua' },
       update: {},
@@ -107,7 +127,30 @@ async function main() {
         isFeatured: true,
       },
     })
-    console.log('Created sample listing')
+    console.log('Created sample product listing')
+  }
+
+  if (jasaCategory && provider) {
+    // Create sample service listing
+    await prisma.listing.upsert({
+      where: { slug: 'jasa-bangun-rumah' },
+      update: {},
+      create: {
+        title: 'Jasa Bangun Rumah & Renovasi',
+        slug: 'jasa-bangun-rumah',
+        description: 'Jasa pembangunan rumah, renovasi, dan perbaikan bangunan. Tim berpengalaman membangun rumah di seluruh wilayah Sabu Raijua. Gratis konsultasi dan survey lokasi.',
+        price: 500000,
+        priceType: 'STARTING_FROM',
+        images: [],
+        location: 'Kota Waikabubak',
+        phone: '6289876543210',
+        categoryId: jasaCategory.id,
+        userId: provider.id,
+        status: 'ACTIVE',
+        isFeatured: true,
+      },
+    })
+    console.log('Created sample service listing')
   }
 
   // Create demo promo banners
@@ -150,7 +193,17 @@ async function main() {
   }
   console.log('Created demo promo banners')
 
+  console.log('')
+  console.log('========================================')
   console.log('Seeding completed!')
+  console.log('========================================')
+  console.log('')
+  console.log('Login credentials:')
+  console.log('---------------------------------------')
+  console.log('Admin:   admin@sabuconnect.id    / admin123')
+  console.log('Provider: provider@sabuconnect.id / provider123')
+  console.log('User:    user@sabuconnect.id    / user123')
+  console.log('========================================')
 }
 
 main()

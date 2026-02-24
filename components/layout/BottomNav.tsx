@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useSession } from 'next-auth/react'
+import { useState, useEffect } from 'react'
 
 interface NavItem {
   href: string
@@ -12,7 +13,34 @@ interface NavItem {
 
 export function BottomNav() {
   const pathname = usePathname()
-  const { data: session } = useSession()
+  const { data: session, status } = useSession()
+  const [mounted, setMounted] = useState(false)
+  
+  // Prevent hydration mismatch
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+  
+  if (!mounted || status === 'loading') {
+    return (
+      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg md:hidden z-50 safe-area-pb">
+        <div className="flex items-center justify-around h-16 px-2">
+          <div className="flex flex-col items-center justify-center flex-1 h-full py-2 px-1">
+            <div className="w-5 h-5 bg-gray-200 rounded animate-pulse" />
+            <span className="text-xs mt-1 font-medium text-gray-300">Loading...</span>
+          </div>
+          <div className="flex flex-col items-center justify-center flex-1 h-full py-2 px-1">
+            <div className="w-5 h-5 bg-gray-200 rounded animate-pulse" />
+            <span className="text-xs mt-1 font-medium text-gray-300">Loading...</span>
+          </div>
+          <div className="flex flex-col items-center justify-center flex-1 h-full py-2 px-1">
+            <div className="w-5 h-5 bg-gray-200 rounded animate-pulse" />
+            <span className="text-xs mt-1 font-medium text-gray-300">Loading...</span>
+          </div>
+        </div>
+      </nav>
+    )
+  }
   
   // Navigation items for regular users (masyarakat)
   const userNavItems: NavItem[] = [

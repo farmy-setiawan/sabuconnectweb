@@ -17,9 +17,11 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [siteSettings, setSiteSettings] = useState<SiteSettings>({ logo: null, siteName: 'SABUConnect' })
+  const [mounted, setMounted] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
+    setMounted(true)
     fetchSiteSettings()
   }, [])
 
@@ -96,7 +98,7 @@ export function Header() {
             )}
 
             {/* Profile Icon or Auth */}
-            {status === 'loading' ? (
+            {status === 'loading' || !mounted ? (
               <div className="w-10 h-10 bg-gray-100 animate-pulse rounded-full" />
             ) : session ? (
               <div className="flex items-center gap-3">
@@ -174,7 +176,7 @@ export function Header() {
                 Produk
               </Link>
               <div className="pt-4 border-t border-gray-100 flex flex-col gap-3">
-                {session ? (
+                {mounted && session ? (
                   <>
                     <Link href={session.user.role === 'PROVIDER' ? '/provider' : session.user.role === 'ADMIN' ? '/admin' : '/dashboard'} onClick={() => setMobileMenuOpen(false)}>
                       <Button variant="ghost" className="w-full">Dashboard</Button>

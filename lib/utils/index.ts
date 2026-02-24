@@ -4,7 +4,12 @@ export function cn(...inputs: ClassValue[]) {
   return clsx(inputs)
 }
 
-export function formatPrice(price: number | string | { toNumber(): number; toString(): string }): string {
+export function formatPrice(price: number | string | { toNumber(): number; toString(): string } | null | undefined): string {
+  // Handle null/undefined
+  if (price === null || price === undefined) {
+    return 'Hubungi untuk harga'
+  }
+  
   let numPrice: number
   if (typeof price === 'object' && price !== null && 'toNumber' in price) {
     numPrice = price.toNumber()
@@ -13,6 +18,12 @@ export function formatPrice(price: number | string | { toNumber(): number; toStr
   } else {
     numPrice = price
   }
+  
+  // Check if valid number
+  if (isNaN(numPrice)) {
+    return 'Hubungi untuk harga'
+  }
+  
   return new Intl.NumberFormat('id-ID', {
     style: 'currency',
     currency: 'IDR',
