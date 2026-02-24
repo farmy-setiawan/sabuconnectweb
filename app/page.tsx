@@ -8,6 +8,8 @@ import { MobileLayout } from '@/components/home/MobileLayout'
 import prisma from '@/lib/prisma/prisma'
 import { APP_NAME } from '@/lib/constants'
 
+export const dynamic = 'force-dynamic'
+
 async function getFeaturedListings() {
   try {
     const listings = await prisma.listing.findMany({
