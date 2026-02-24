@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma/prisma'
 
 export const dynamic = 'force-dynamic'
+export const revalidate = 3600 // Cache for 1 hour (villages don't change often)
 
 // GET all active villages (public endpoint for dropdowns)
 export async function GET(request: Request) {

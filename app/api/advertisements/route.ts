@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import prisma from '@/lib/prisma/prisma'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 60 // Cache for 1 minute
+
 // GET - Fetch advertisements
 export async function GET(request: Request) {
   try {

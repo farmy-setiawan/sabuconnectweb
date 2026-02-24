@@ -3,6 +3,9 @@ import { auth } from '@/lib/auth'
 import prisma from '@/lib/prisma/prisma'
 import { slugify } from '@/lib/utils'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 60 // Cache for 60 seconds
+
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)

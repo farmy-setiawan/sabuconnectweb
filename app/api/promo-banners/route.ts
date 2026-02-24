@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma/prisma'
 
 export const dynamic = 'force-dynamic'
+export const revalidate = 300 // Cache for 5 minutes
 
 export async function GET(request: Request) {
   try {
