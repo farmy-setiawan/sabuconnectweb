@@ -54,7 +54,7 @@ export default function ListingDetailPage({ params }: ListingDetailPageProps) {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#03a21d]"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
       </div>
     )
   }
@@ -95,13 +95,13 @@ export default function ListingDetailPage({ params }: ListingDetailPageProps) {
         <div className="bg-white border-b">
           <div className="container mx-auto px-4 py-4">
             <nav className="flex items-center gap-2 text-sm">
-              <Link href="/" className="text-gray-500 hover:text-[#03a21d] transition-colors">
+              <Link href="/" className="text-gray-500 hover:text-green-600 transition-colors">
                 Beranda
               </Link>
               <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
-              <Link href="/search" className="text-gray-500 hover:text-[#03a21d] transition-colors">
+              <Link href="/search" className="text-gray-500 hover:text-green-600 transition-colors">
                 Listing
               </Link>
               <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -162,7 +162,7 @@ export default function ListingDetailPage({ params }: ListingDetailPageProps) {
                           onClick={() => setSelectedImage(index)}
                           className={`relative w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden border-2 transition-all ${
                             selectedImage === index 
-                              ? 'border-[#03a21d] ring-2 ring-[#03a21d]/30' 
+                              ? 'border-green-600 ring-2 ring-green-600/30' 
                               : 'border-transparent hover:border-gray-300'
                           }`}
                         >
@@ -188,7 +188,7 @@ export default function ListingDetailPage({ params }: ListingDetailPageProps) {
                       {listing.category?.type === 'JASA' ? 'JASA' : 'PRODUK'}
                     </Badge>
                     {listing.promotionStatus === 'ACTIVE' && (
-                      <Badge className="bg-amber-500 text-white font-medium px-3 py-1">
+                      <Badge className="bg-green-500 text-white font-medium px-3 py-1">
                         <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                           <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                         </svg>
@@ -295,7 +295,7 @@ export default function ListingDetailPage({ params }: ListingDetailPageProps) {
                 <CardContent className="p-6">
                   <div className="mb-4">
                     <p className="text-sm text-gray-500 mb-1">{priceLabel}</p>
-                    <p className="text-3xl font-bold text-[#03a21d]">
+                    <p className="text-3xl font-bold text-green-600">
                       {formatPrice(price)}
                     </p>
                     {listing.priceType === 'NEGOTIABLE' && (
@@ -334,21 +334,31 @@ export default function ListingDetailPage({ params }: ListingDetailPageProps) {
 
               {/* Provider Card */}
               <Card className="border-0 shadow-md">
-                <CardContent className="p-6">
+                <CardContent className="p-4 md:p-6">
                   <h3 className="font-semibold text-gray-900 mb-4">Informasi Penyedia</h3>
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="w-16 h-16 bg-gradient-to-br from-[#03a21d] to-[#028a17] rounded-full flex items-center justify-center text-white font-bold text-xl">
+                  <div className="flex items-center gap-3 md:gap-4 mb-4">
+                    <div className="w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center text-white font-bold text-lg md:text-xl">
                       {listing.user?.name?.charAt(0).toUpperCase() || 'P'}
                     </div>
                     <div>
-                      <p className="font-semibold text-gray-900">{listing.user?.name || 'Penyedia'}</p>
-                      <p className="text-sm text-gray-500">Anggota sejak {listing.user?.createdAt ? formatDate(listing.user.createdAt) : 'Baru'}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="font-semibold text-gray-900">{listing.user?.name || 'Penyedia'}</p>
+                        {listing.user?.isVerified && (
+                          <Badge className="bg-green-500 text-white text-[10px] px-2">
+                            <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                            Verified
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-xs md:text-sm text-gray-500">Anggota sejak {listing.user?.createdAt ? formatDate(listing.user.createdAt) : 'Baru'}</p>
                     </div>
                   </div>
                   
                   {session?.user?.id !== listing.userId && (
                     <Link href={`/provider/${listing.userId}`} className="block">
-                      <button className="w-full border-2 border-[#03a21d] text-[#03a21d] font-semibold py-3 px-6 rounded-xl hover:bg-[#03a21d] hover:text-white transition-all duration-300">
+                      <button className="w-full border-2 border-green-600 text-green-600 font-semibold py-3 px-6 rounded-xl hover:bg-green-600 hover:text-white transition-all duration-300">
                         Lihat Profil Penyedia
                       </button>
                     </Link>

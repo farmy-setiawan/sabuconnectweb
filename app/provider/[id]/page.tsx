@@ -115,10 +115,10 @@ export default async function ProviderProfilePage({ params }: ProviderProfilePag
     <div className="min-h-screen bg-gray-50">
       <Header />
       
-      <main className="container-app py-8">
+      <main className="container-app py-6 md:py-10">
         {/* Provider Profile Header */}
-        <div className="bg-white rounded-2xl shadow-sm p-6 mb-8">
-          <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
+        <div className="bg-white rounded-2xl shadow-sm p-4 md:p-8 mb-8">
+          <div className="flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-8">
             {/* Avatar */}
             <div className="relative">
               {provider.avatar ? (
@@ -135,7 +135,7 @@ export default async function ProviderProfilePage({ params }: ProviderProfilePag
                 </div>
               )}
               {provider.isVerified && (
-                <div className="absolute bottom-0 right-0 bg-blue-500 rounded-full p-1.5">
+                <div className="absolute bottom-0 right-0 bg-green-500 rounded-full p-1.5">
                   <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
@@ -145,32 +145,24 @@ export default async function ProviderProfilePage({ params }: ProviderProfilePag
             
             {/* Info */}
             <div className="text-center md:text-left flex-1">
-              <div className="flex items-center justify-center md:justify-start gap-2 mb-2">
-                <h1 className="text-2xl font-bold text-gray-900">{provider.name}</h1>
+              <div className="flex flex-col md:flex-row items-center md:items-center gap-2 mb-4">
+                <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{provider.name}</h1>
                 {provider.isVerified && (
-                  <Badge className="bg-blue-500 text-white">Terverifikasi</Badge>
+                  <Badge className="bg-green-500 text-white font-medium text-xs">Terverifikasi</Badge>
                 )}
               </div>
               
-              <div className="flex items-center justify-center md:justify-start gap-4 text-gray-600 mb-4">
-                {provider.phone && (
-                  <span className="flex items-center gap-1">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                    </svg>
-                    {provider.phone}
-                  </span>
-                )}
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 md:gap-4 text-gray-500 text-sm mb-4">
                 <span className="flex items-center gap-1">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
-                  Berjoin sejak {new Date(provider.createdAt).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}
+                  <span>Berjoin {new Date(provider.createdAt).toLocaleDateString('id-ID', { month: 'short', year: 'numeric' })}</span>
                 </span>
               </div>
               
-              <div className="flex items-center justify-center md:justify-start gap-2">
-                <div className="bg-primary/10 text-primary px-4 py-2 rounded-lg font-semibold">
+              <div className="flex items-center justify-center md:justify-start">
+                <div className="bg-green-50 text-green-700 px-5 py-2.5 rounded-xl font-semibold text-sm">
                   {provider._count.listings} Listing Aktif
                 </div>
               </div>
@@ -180,7 +172,7 @@ export default async function ProviderProfilePage({ params }: ProviderProfilePag
         
         {/* Listings */}
         <div>
-          <h2 className="text-xl font-bold text-gray-900 mb-6">Listing dari {provider.name}</h2>
+          <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-6">Listing dari {provider.name}</h2>
           
           {listings.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
