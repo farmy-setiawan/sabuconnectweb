@@ -1,5 +1,6 @@
 'use client'
 
+import { memo, useCallback, useMemo } from 'react'
 import Link from 'next/link'
 import { Card, CardContent } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
@@ -13,7 +14,7 @@ interface ListingCardProps {
   listing: Listing
 }
 
-export function ListingCard({ listing }: ListingCardProps) {
+function ListingCardComponent({ listing }: ListingCardProps) {
   const router = useRouter()
   const { data: session } = useSession()
   
@@ -23,7 +24,7 @@ export function ListingCard({ listing }: ListingCardProps) {
   const whatsappLink = phoneNumber ? generateWhatsAppLink(phoneNumber, whatsappMessage) : ''
   const hasWhatsApp = !!phoneNumber
 
-  const handleWhatsAppClick = (e: React.MouseEvent) => {
+  const handleWhatsAppClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation()
     if (!session) {
       alert('Silakan login terlebih dahulu untuk menghubungi via WhatsApp')
@@ -31,23 +32,25 @@ export function ListingCard({ listing }: ListingCardProps) {
       return
     }
     window.open(whatsappLink, '_blank')
-  }
+  }, [session, router, whatsappLink])
 
-  const priceLabel =
+  // Memoized computed values for performance
+  const priceLabel = useMemo(() =>
     listing.priceType === 'NEGOTIABLE'
       ? 'Nego'
       : listing.priceType === 'STARTING_FROM'
       ? 'Mulai dari'
-      : ''
+      : '',
+    [listing.priceType]
+  )
 
-  const categoryType = listing.category?.type || 'JASA'
-  const categoryName = listing.category?.name || ''
+  const categoryType = useMemo(() => listing.category?.type || 'JASA', [listing.category?.type])
+  const categoryName = useMemo(() => listing.category?.name || '', [listing.category?.name])
+  const isProduct = useMemo(() => categoryType === 'PRODUK', [categoryType])
 
-  const handleClick = () => {
+  const handleClick = useCallback(() => {
     router.push(`/listing/${listing.slug}`)
-  }
-
-  const isProduct = categoryType === 'PRODUK'
+  }, [router, listing.slug])
 
   return (
     <div onClick={handleClick} className="cursor-pointer">
@@ -182,3 +185,18 @@ export function ListingCard({ listing }: ListingCardProps) {
     </div>
   )
 }
+
+// Memoized export for performance optimization
+// Prevents re-render when parent re-renders but props haven't changed
+export const ListingCard = memo(ListingCardComponent, (prevProps, nextProps) => {
+  // Custom comparison: only re-render if listing data actually changed
+  return (
+    prevProps.listing.id === nextProps.listing.id &&
+    prevProps.listing.title === nextProps.listing.title &&
+    prevProps.listing.price === nextProps.listing.price &&
+    prevProps.listing.views === nextProps.listing.views &&
+    prevProps.listing.updatedAt === nextProps.listing.updatedAt
+  )
+})
+
+ListingCard.displayName = 'ListingCard'

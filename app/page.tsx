@@ -8,7 +8,9 @@ import { MobileLayout } from '@/components/home/MobileLayout'
 import prisma from '@/lib/prisma/prisma'
 import { APP_NAME } from '@/lib/constants'
 
-export const dynamic = 'force-dynamic'
+// Use revalidation for ISR - better than force-dynamic for caching
+// This allows the page to be cached but revalidated every 60 seconds
+export const revalidate = 60
 
 async function getFeaturedListings() {
   try {

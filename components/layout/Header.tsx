@@ -1,8 +1,8 @@
 'use client'
 
+import { memo, useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { useSession, signOut } from 'next-auth/react'
-import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/Button'
 import { cn } from '@/lib/utils'
@@ -12,7 +12,7 @@ interface SiteSettings {
   siteName: string
 }
 
-export function Header() {
+function HeaderComponent() {
   const { data: session, status } = useSession()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -37,14 +37,14 @@ export function Header() {
     }
   }
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = useCallback((e: React.FormEvent) => {
     e.preventDefault()
     if (searchQuery.trim()) {
       router.push(`/search?q=${encodeURIComponent(searchQuery)}`)
     } else {
       router.push('/search?q=')
     }
-  }
+  }, [searchQuery, router])
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
@@ -203,3 +203,7 @@ export function Header() {
     </header>
   )
 }
+
+// Memoized export for performance optimization
+export const Header = memo(HeaderComponent)
+Header.displayName = 'Header'

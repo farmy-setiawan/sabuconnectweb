@@ -85,17 +85,49 @@ export async function GET(request: Request) {
         orderBy,
         skip,
         take: limit,
-        include: {
+        // Select only needed fields for better performance
+        select: {
+          id: true,
+          title: true,
+          slug: true,
+          description: true,
+          price: true,
+          priceType: true,
+          images: true,
+          location: true,
+          phone: true,
+          status: true,
+          isFeatured: true,
+          views: true,
+          userId: true,
+          categoryId: true,
+          promotionPriority: true,
+          createdAt: true,
+          updatedAt: true,
+          // Include related data with select for optimized queries
           user: {
             select: {
               id: true,
               name: true,
               avatar: true,
+              isVerified: true,
             },
           },
-          category: true,
-          promotion: true as any,
-        } as any,
+          category: {
+            select: {
+              id: true,
+              name: true,
+              type: true,
+            },
+          },
+          promotion: {
+            select: {
+              id: true,
+              status: true,
+              createdAt: true,
+            },
+          },
+        },
       }),
       prisma.listing.count({ where }),
     ])

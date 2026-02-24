@@ -1,6 +1,7 @@
+import { memo } from 'react'
 import Link from 'next/link'
 
-export function Footer() {
+function FooterComponent() {
   return (
     <footer className="bg-primary text-white">
       <div className="container-app py-12">
@@ -94,3 +95,7 @@ export function Footer() {
     </footer>
   )
 }
+
+// Memoized export for performance optimization
+export const Footer = memo(FooterComponent)
+Footer.displayName = 'Footer'
