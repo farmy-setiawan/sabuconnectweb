@@ -46,32 +46,44 @@ export async function POST(
       return NextResponse.json({ error: 'Listing bukan milik Anda' }, { status: 403 })
     }
 
-    // Check if already has active promotion (using raw query for now since types not generated)
-    if ((listing as any).promotionStatus === 'ACTIVE') {
+    // Check if already has active promotion
+    if (listing.promotionStatus === 'ACTIVE') {
       return NextResponse.json({ error: 'Listing sudah dalam promosi aktif' }, { status: 400 })
     }
 
     // Calculate total price
     const totalPrice = days * PROMOTION_PRICE_PER_DAY
 
-    // Create promotion payment
-    const promotionPayment = await (prisma as any).promotionPayment.upsert({
-      where: { listingId: listing.id },
-      update: {
-        amount: totalPrice,
-        method,
-        status: 'PENDING',
-        proofImage: null,
-        rejectionReason: null,
-      },
-      create: {
-        listingId: listing.id,
-        providerId: user.id,
-        amount: totalPrice,
-        method,
-        status: 'PENDING',
-      }
+    // Check if promotion payment already exists
+    const existingPayment = await prisma.promotionPayment.findUnique({
+      where: { listingId: listing.id }
     })
+
+    let promotionPayment
+    if (existingPayment) {
+      // Update existing payment
+      promotionPayment = await prisma.promotionPayment.update({
+        where: { listingId: listing.id },
+        data: {
+          amount: totalPrice,
+          method: method as 'COD' | 'TRANSFER',
+          status: 'PENDING',
+          proofImage: null,
+          rejectionReason: null,
+        }
+      })
+    } else {
+      // Create new payment
+      promotionPayment = await prisma.promotionPayment.create({
+        data: {
+          listingId: listing.id,
+          providerId: user.id,
+          amount: totalPrice,
+          method: method as 'COD' | 'TRANSFER',
+          status: 'PENDING',
+        }
+      })
+    }
 
     // Update listing promotion status
     await prisma.listing.update({
@@ -81,7 +93,7 @@ export async function POST(
         promotionDays: days,
         promotionPrice: totalPrice,
         promotionPriority: 0,
-      } as any
+      }
     })
 
     return NextResponse.json({
@@ -92,7 +104,7 @@ export async function POST(
       payment: {
         id: promotionPayment.id,
         amount: totalPrice,
-        method,
+        method: promotionPayment.method,
         status: promotionPayment.status
       }
     })

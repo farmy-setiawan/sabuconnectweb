@@ -37,7 +37,7 @@ export async function POST(request: Request) {
     // Find the listing
     const listing = await prisma.listing.findUnique({
       where: { id: listingId },
-      include: { promotion: true } as any
+      include: { promotion: true }
     })
 
     if (!listing) {
@@ -68,11 +68,11 @@ export async function POST(request: Request) {
     const proofUrl = `/uploads/promotions/${fileName}`
 
     // Update promotion payment with proof
-    await (prisma as any).promotionPayment.update({
+    await prisma.promotionPayment.update({
       where: { listingId: listing.id },
       data: {
         proofImage: proofUrl,
-        status: 'PENDING' // Will be verified by admin
+        status: 'PENDING'
       }
     })
 
@@ -81,7 +81,7 @@ export async function POST(request: Request) {
       where: { id: listing.id },
       data: {
         promotionStatus: 'PAYMENT_UPLOADED'
-      } as any
+      }
     })
 
     return NextResponse.json({
