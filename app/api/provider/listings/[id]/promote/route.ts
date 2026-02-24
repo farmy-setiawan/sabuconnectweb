@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import prisma from '@/lib/prisma/prisma'
 
+export const dynamic = 'force-dynamic'
+
 const PROMOTION_PRICE_PER_DAY = 1000
 
 export async function POST(
