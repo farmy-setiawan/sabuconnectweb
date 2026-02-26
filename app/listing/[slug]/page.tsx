@@ -255,11 +255,20 @@ export default function ListingDetailPage({ params }: ListingDetailPageProps) {
                         <button 
                           onClick={() => {
                             if (navigator.share) {
-                              navigator.share({
+                              const shareData = {
                                 title: listing.title,
-                                text: `Lihat listing "${listing.title}" di SABUConnect`,
+                                text: `Lihat listing "${listing.title}" di SABUConnect - ${listing.location}`,
                                 url: window.location.href,
-                              })
+                              }
+                              // For platforms that support images
+                              if (listing.images && listing.images.length > 0) {
+                                (shareData as any).files = []
+                              }
+                              navigator.share(shareData)
+                            } else {
+                              // Fallback to clipboard
+                              navigator.clipboard.writeText(window.location.href)
+                              alert('Link berhasil disalin!')  
                             }
                           }}
                           className="p-2 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors"
