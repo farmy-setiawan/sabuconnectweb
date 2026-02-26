@@ -53,7 +53,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
     )
   }
 
-  const price = typeof listing.price === 'string' ? parseFloat(listing.price) : listing.price
+  const price = typeof listing.price === 'string' ? parseFloat(listing.price) : Number(listing.price)
   const formattedPrice = new Intl.NumberFormat('id-ID', {
     style: 'currency',
     currency: 'IDR',
