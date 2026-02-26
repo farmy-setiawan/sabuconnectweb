@@ -14,7 +14,6 @@ export const contentType = 'image/png'
 export default async function Image({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
 
-  // Fetch listing data
   const listing = await prisma.listing.findUnique({
     where: { slug },
     include: {
@@ -27,42 +26,15 @@ export default async function Image({ params }: { params: Promise<{ slug: string
     },
   })
 
-  if (!listing) {
-    return new ImageResponse(
-      (
-        <div
-          style={{
-            background: '#16a34a',
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <div style={{ color: 'white', fontSize: 48, fontWeight: 'bold' }}>
-            SABUConnect
-          </div>
-          <div style={{ color: 'white', fontSize: 24, marginTop: 10 }}>
-            Listing Tidak Ditemukan
-          </div>
-        </div>
-      ),
-      { ...size }
-    )
-  }
-
-  const price = typeof listing.price === 'string' ? parseFloat(listing.price) : Number(listing.price)
+  const price = listing ? (typeof listing.price === 'string' ? parseFloat(listing.price) : Number(listing.price)) : 0
   const formattedPrice = new Intl.NumberFormat('id-ID', {
     style: 'currency',
     currency: 'IDR',
     maximumFractionDigits: 0,
   }).format(price)
 
-  const listingImage = listing.images && listing.images.length > 0 ? listing.images[0] : null
+  const listingImage = listing?.images && listing.images.length > 0 ? listing.images[0] : null
 
-  // Create the OG image
   return new ImageResponse(
     (
       <div
@@ -74,7 +46,6 @@ export default async function Image({ params }: { params: Promise<{ slug: string
           flexDirection: 'column',
         }}
       >
-        {/* Header with gradient */}
         <div
           style={{
             background: 'linear-gradient(to right, #16a34a, #22c55e)',
@@ -90,7 +61,6 @@ export default async function Image({ params }: { params: Promise<{ slug: string
           </span>
         </div>
 
-        {/* Main content */}
         <div
           style={{
             display: 'flex',
@@ -99,27 +69,26 @@ export default async function Image({ params }: { params: Promise<{ slug: string
             gap: '30px',
           }}
         >
-          {/* Image section */}
           <div
             style={{
               width: '400px',
               height: '300px',
-              background: listingImage ? '#f3f4f6' : '#e5e7eb',
+              background: '#e5e7eb',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               borderRadius: '16px',
-              overflow: 'hidden',
             }}
           >
             {listingImage ? (
               <img
                 src={listingImage}
-                alt={listing.title}
+                alt={listing?.title || 'Listing'}
                 style={{
                   width: '100%',
                   height: '100%',
                   objectFit: 'cover',
+                  borderRadius: '16px',
                 }}
               />
             ) : (
@@ -127,7 +96,6 @@ export default async function Image({ params }: { params: Promise<{ slug: string
             )}
           </div>
 
-          {/* Details section */}
           <div
             style={{
               flex: 1,
@@ -136,7 +104,6 @@ export default async function Image({ params }: { params: Promise<{ slug: string
               justifyContent: 'center',
             }}
           >
-            {/* Category badge */}
             <div
               style={{
                 background: '#dcfce7',
@@ -149,37 +116,30 @@ export default async function Image({ params }: { params: Promise<{ slug: string
                 marginBottom: '16px',
               }}
             >
-              {listing.category?.name || 'Listing'}
+              {listing?.category?.name || 'Listing'}
             </div>
 
-            {/* Title */}
             <h1
               style={{
                 fontSize: 36,
                 fontWeight: 'bold',
                 color: '#111827',
                 marginBottom: '12px',
-                lineHeight: 1.2,
               }}
             >
-              {listing.title}
+              {listing?.title || 'Listing Title'}
             </h1>
 
-            {/* Location */}
             <p
               style={{
                 fontSize: 22,
                 color: '#6b7280',
                 marginBottom: '16px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
               }}
             >
-              📍 {listing.location}
+              📍 {listing?.location || 'Location'}
             </p>
 
-            {/* Price */}
             <div
               style={{
                 fontSize: 40,
@@ -190,7 +150,6 @@ export default async function Image({ params }: { params: Promise<{ slug: string
               {formattedPrice}
             </div>
 
-            {/* Posted by */}
             <p
               style={{
                 fontSize: 18,
@@ -198,12 +157,11 @@ export default async function Image({ params }: { params: Promise<{ slug: string
                 marginTop: '16px',
               }}
             >
-              Posted by {listing.user?.name || 'SABUConnect'}
+              Posted by {listing?.user?.name || 'SABUConnect'}
             </p>
           </div>
         </div>
 
-        {/* Footer */}
         <div
           style={{
             background: '#f9fafb',
