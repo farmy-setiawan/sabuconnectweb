@@ -29,7 +29,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     maximumFractionDigits: 0,
   }).format(price)
 
-  const listingImage = listing.images && listing.images.length > 0 ? listing.images[0] : ''
+  const listingImage = listing.images && listing.images.length > 0 ? listing.images[0] : null
+  const imageUrl = listingImage ? listingImage : '/images/hero-bg.jpg'
 
   return {
     title: `${listing.title} - ${formattedPrice} | SABUConnect`,
@@ -41,7 +42,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       url: `https://sabuconnect.web.id/listing/${slug}`,
       images: [
         {
-          url: `https://sabuconnect.web.id/api/og/${slug}`,
+          url: imageUrl,
           width: 1200,
           height: 630,
           alt: listing.title,
@@ -52,7 +53,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       card: 'summary_large_image',
       title: `${listing.title} - ${formattedPrice} | SABUConnect`,
       description: `${listing.title} - ${formattedPrice} di ${listing.location}. Ditemukan di SABUConnect - Platform listing terbaik untuk wilayah Sabu.`,
-      images: [`https://sabuconnect.web.id/api/og/${slug}`],
+      images: [imageUrl],
     },
   }
 }
