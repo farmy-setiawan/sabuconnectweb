@@ -102,6 +102,7 @@ export async function GET(request: Request) {
           userId: true,
           categoryId: true,
           promotionPriority: true,
+          promotionStatus: true,
           createdAt: true,
           updatedAt: true,
           // Include related data with select for optimized queries
